@@ -1,24 +1,24 @@
 ##' Create an object summarizing both continuous and categorical variables
 ##'
-##' Create an object summarizing all baseline variables (both continuous and categorical) optionally stratifying by one or more startifying variables and performing statistical tests. The object gives a table that is easy to use in medical research papers.
+##' Create an object summarizing all baseline variables (both continuous and categorical) optionally stratifying by one or more stratifying variables and performing statistical tests. The object gives a table that is easy to use in medical research papers.
 ##'
 ##' @param vars Variables to be summarized given as a character vector. Factors are handled as categorical variables, whereas numeric variables are handled as continuous variables. If empty, all variables in the data frame specified in the data argument are used.
 ##' @param strata Stratifying (grouping) variable name(s) given as a character vector. If omitted, the overall results are returned.
-##' @param data A data frame in which these variables exist. All variables (both vars and strata) must be in this data frame.
+##' @param data A data frame in which these variables exist. All variables (both \code{vars} and \code{strata}) must be in this data frame.
 ##' @param factorVars Numerically coded variables that should be handled as categorical variables given as a character vector. Do not include factors, unless you need to relevel them by removing empty levels. If omitted, only factors are considered categorical variables. The variables specified here must also be specified in the \code{vars} argument.
-##' @param includeNA If TRUE, NA is handled as a regular factor level rather than missing. NA is shown as the last factor level in the table. Only effective for categorical variables.
-##' @param test If TRUE, as in the default and there are more than two groups, groupwise comparisons are performed.
-##' @param testNormal A function used to perform the normal assumption based tests. The default is \code{oneway.test}. This is equivalent of the t-test when there are only two groups.
+##' @param includeNA If \code{TRUE}, \code{NA} is handled as a regular factor level rather than missing. \code{NA} is shown as the last factor level in the table. Only effective for categorical variables.
+##' @param test If \code{TRUE}, as in the default and there are more than two groups, groupwise comparisons are performed.
+##' @param testNormal A function used to perform the normal assumption based tests. The default is \code{oneway.test}. This is equivalent to the t-test when there are only two groups.
 ##' @param argsNormal A named list of arguments passed to the function specified in \code{testNormal}. The default is \code{list(var.equal = TRUE)}, which makes it the ordinary ANOVA that assumes equal variance across groups.
-##' @param testNonNormal A function used to perform the nonparametric tests. The default is \code{kruskal.test} (Kruskal-Wallis Rank Sum Test). This is equivalent of the wilcox.test (Man-Whitney U test) when there are only two groups.
+##' @param testNonNormal A function used to perform the nonparametric tests. The default is \code{kruskal.test} (Kruskal-Wallis Rank Sum Test). This is equivalent to the \code{wilcox.test} (Mann-Whitney U test) when there are only two groups.
 ##' @param argsNonNormal A named list of arguments passed to the function specified in \code{testNonNormal}. The default is \code{list(NULL)}, which is just a placeholder.
-##' @param testApprox A function used to perform the large sample approximation based tests. The default is \code{chisq.test}. This is not recommended when some of the cell have small counts like fewer than 5.
-##' @param argsApprox A named list of arguments passed to the function specified in testApprox. The default is \code{list(correct = TRUE)}, which turns on the continuity correction for \code{chisq.test}.
-##' @param testExact A function used to perform the exact tests. The default is \code{fisher.test}. If the cells have large numbers, it will fail because of memory limitation. In this situation, the large sample approximation based should suffice.
-##' @param argsExact A named list of arguments passed to the function specified in testExact. The default is \code{list(workspace = 2*10^5)}, which specifies the memory space allocated for \code{fisher.test}.
-##' @param smd If TRUE, as in the default and there are more than two groups, standardized mean differences for all pairwise comparisons are calculated.
+##' @param testApprox A function used to perform the large sample approximation based tests. The default is \code{chisq.test}. This is not recommended when some of the cells have small counts like fewer than 5.
+##' @param argsApprox A named list of arguments passed to the function specified in \code{testApprox}. The default is \code{list(correct = TRUE)}, which turns on the continuity correction for \code{chisq.test}.
+##' @param testExact A function used to perform the exact tests. The default is \code{fisher.test}. If the cells have large numbers, it will fail because of memory limitations. In this situation, the large sample approximation based should suffice.
+##' @param argsExact A named list of arguments passed to the function specified in \code{testExact}. The default is \code{list(workspace = 2*10^5)}, which specifies the memory space allocated for \code{fisher.test}.
+##' @param smd If \code{TRUE}, as in the default and there are more than two groups, standardized mean differences for all pairwise comparisons are calculated.
 ##'
-##' @details The definitions of the standardized mean difference (SMD) are available in \href{http://www.tandfonline.com/doi/abs/10.1080/00031305.1986.10475403}{Flury \emph{et al} 1986} for the univariate case and the multivariate case (essentially the square root of the Mahalanobis distance). Extension to binary variables is discussed in \href{http://www.tandfonline.com/doi/abs/10.1080/03610910902859574}{Austin 2009} and extension to multinomival variables is suggested in \href{http://support.sas.com/resources/papers/proceedings12/335-2012.pdf}{Yang \emph{et al} 2012}. This multinomial extesion treats a single multinomial variable as multiple non-redundant dichotomous variables and use the Mahalanobis distance. The off diagonal elements of the covariance matrix on page 3 have an error, and need negation. In weighted data, the same definitions can be used except that the mean and standard deviation estimates are weighted estimates (\href{http://www.ncbi.nlm.nih.gov/pubmed/23902694}{Li \emph{et al} 2013} and \href{http://onlinelibrary.wiley.com/doi/10.1002/sim.6607/full}{Austin \emph{et al} 2015}). In tableone, all weighted estimates are calculated by weighted estimation functions in the \code{survey} package.
+##' @details The definitions of the standardized mean difference (SMD) are available in \href{http://www.tandfonline.com/doi/abs/10.1080/00031305.1986.10475403}{Flury \emph{et al} 1986} for the univariate case and the multivariate case (essentially the square root of the Mahalanobis distance). Extension to binary variables is discussed in \href{http://www.tandfonline.com/doi/abs/10.1080/03610910902859574}{Austin 2009} and extension to multinomial variables is suggested in \href{http://support.sas.com/resources/papers/proceedings12/335-2012.pdf}{Yang \emph{et al} 2012}. This multinomial extension treats a single multinomial variable as multiple non-redundant dichotomous variables and uses the Mahalanobis distance. The off-diagonal elements of the covariance matrix on page 3 have an error, and need negation. In weighted data, the same definitions can be used except that the mean and standard deviation estimates are weighted estimates (\href{http://www.ncbi.nlm.nih.gov/pubmed/23902694}{Li \emph{et al} 2013} and \href{http://onlinelibrary.wiley.com/doi/10.1002/sim.6607/full}{Austin \emph{et al} 2015}). In \code{tableone}, all weighted estimates are calculated by weighted estimation functions in the \code{survey} package.
 ##'
 ##' @return An object of class \code{TableOne}, which is a list of three objects.
 ##' @return \item{ContTable}{object of class \code{ContTable}, containing continuous variables only}
@@ -195,7 +195,7 @@ function(vars,                                      # character vector of variab
     if (!missing(strata)) {
 
         ## Check strata. This returns a DF. Returns a "Overall" DF if strata is missing.
-        ## Must not be place outside if (!missing(strata)) {  }.
+        ## Must not be placed outside if (!missing(strata)) {  }.
         dfStrata <- ModuleReturnStrata(strata, data)
         ## Return variable names. Code inefficient in exchange for code simplicity.
         strata   <- names(dfStrata)
@@ -241,7 +241,7 @@ function(vars,                                      # character vector of variab
     TableOneObject <- list(ContTable = ContTable,
                            CatTable  = CatTable,
                            MetaData  = list(vars        = vars,
-                                            ## describes which pos is vars is factor
+                                            ## describes which pos in vars is factor
                                             logiFactors = logiFactors,
                                             ## names of vars of each type
                                             varFactors  = varFactors,
@@ -251,7 +251,7 @@ function(vars,                                      # character vector of variab
                                             ## Variable labels
                                             varLabels = varLabels))
 
-    ## Give a class
+    ## Give the object a class
     class(TableOneObject) <- "TableOne"
 
     ## Return the object
